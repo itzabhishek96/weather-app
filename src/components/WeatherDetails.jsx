@@ -1,33 +1,62 @@
 import React, { useEffect, useState } from "react";
-import "./App.css";
-import TopButtons from "./components/TopButtons";
-import Inputs from "./components/Inputs";
-import TimeAndLocation from "./components/TimeAndLocation";
-import TemperatureAndDetails from "./components/TemperatureAndDetails";
-import getFormattedWeatherData from "./services/weatherService";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import hotBg from "./assets/hot.jpg";
-import coldBg from "./assets/cold.jpg";
-import clearBg from "./assets/clear.jpg";
-import hazeBg from "./assets/haze.jpg";
-import cloudyBg from "./assets/cloudy.jpg";
-import rainyBg from "./assets/rainy.jpg";
-import Citydata from "./components/Citydata";
-import Forecast from "./components/Forecast";
+import getFormattedWeatherData, { getForecastData } from "../services/weatherService";
+import Citydata from "./Citydata";
+import TopButtons from "./TopButtons";
+import Inputs from "./Inputs";
+import TimeAndLocation from "./TimeAndLocation";
+import TemperatureAndDetails from "./TemperatureAndDetails";
+import Forecast from "./Forecast";
 import { UilArrowLeft } from "@iconscout/react-unicons";
-import { getForecastData } from "./services/weatherService";
-import "react-toastify/dist/ReactToastify.css";
+import { Link } from "react-router-dom";
+import hotBg from "../assets/hot.jpg";
+import coldBg from "../assets/cold.jpg";
+import clearBg from "../assets/clear.jpg";
+import hazeBg from "../assets/haze.jpg";
+import cloudyBg from "../assets/cloudy.jpg";
+import rainyBg from "../assets/rainy.jpg";
 
-function App() {
+function WeatherDetails() {
   const [query, setQuery] = useState({ q: "" });
   const [units, setUnits] = useState("metric");
   const [weather, setWeather] = useState(null);
   const [forecast, setForecast] = useState(null);
-  const [bg, setBg] = useState("");
-  const [showCityTable, setShowCityTable] = useState(true); // State to manage visibility of city table
+  const [bg, setBg] = useState(clearBg);
 
   useEffect(() => {
+    const fetchData = async () => {
+      let cityName = query.q;
+      if (!cityName) {
+        cityName = localStorage.getItem("selectedCity");
+        localStorage.removeItem("selectedCity");
+      }
+
+      if (cityName) {
+        toast.info(`Fetching weather for ${cityName}`);
+        const data = await getFormattedWeatherData({ q: cityName, units });
+        if (data) {
+          setWeather(data);
+          toast.success(`Weather data loaded for ${cityName}`);
+          updateBackground(data);
+          if (data.lat && data.lon) {
+            const forecastData = await getForecastData(
+              data.lat,
+              data.lon,
+              units
+            );
+            setForecast(forecastData);
+          }
+        } else {
+          toast.error("Failed to load weather data");
+        }
+      }
+    };
+    fetchData();
+  }, [query, units]);
+
+  useEffect(() => {
+    // Fetching weather data for the selected city
     const fetchWeather = async () => {
       const message = query.q ? query.q : "current location.";
       toast.info("Fetching weather for " + message);
@@ -42,40 +71,6 @@ function App() {
 
     fetchWeather();
   }, [query, units]);
-
-  useEffect(() => {
-    if (weather) {
-      let newBg = clearBg;
-      const condition = weather.details.toLowerCase();
-      if (weather.temp <= (units === "metric" ? 20 : 60)) {
-        newBg = coldBg; // Cold weather
-      }
-      switch (condition) {
-        case "clear":
-          newBg = clearBg;
-          break;
-        case "clouds":
-          newBg = cloudyBg;
-          break;
-        case "smoke":
-          newBg = hazeBg;
-          break;
-        case "haze":
-          newBg = hazeBg;
-          break;
-        case "hot":
-          newBg = hotBg;
-          break;
-        case "rain":
-          newBg = rainyBg;
-          break;
-        case "cold":
-          newBg = coldBg;
-          break;
-      }
-      setBg(newBg);
-    }
-  }, [weather, units]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -99,17 +94,39 @@ function App() {
     fetchData();
   }, [query, units]);
 
+  const updateBackground = (weatherData) => {
+    let newBg = coldBg;
+    switch (weatherData.details.toLowerCase()) {
+      case "clear":
+        newBg = clearBg;
+        break;
+      case "clouds":
+        newBg = cloudyBg;
+        break;
+      case "haze":
+        newBg = hazeBg;
+        break;
+      case "smoke":
+        newBg = hazeBg;
+        break;
+      case "hot":
+        newBg = hotBg;
+        break;
+      case "rain":
+        newBg = rainyBg;
+        break;
+      default:
+        newBg = coldBg;
+        break;
+    }
+    setBg(newBg);
+  };
+
   const onCityClick = (cityName) => {
     setQuery({ q: cityName });
   };
   const onCityRightClick = (cityName) => {
     setQuery({ q: cityName });
-  };
-
-  const handleBackButtonClick = () => {
-    setWeather(null);
-    setShowCityTable(true);
-    setBg("");
   };
 
   return (
@@ -129,18 +146,16 @@ function App() {
             onCityRightClick={onCityRightClick}
           />
         )}
+
         <ToastContainer />
 
         <div className="mx-auto max-w-screen-md border-black px-6 bg-gray-700 bg-opacity-75 rounded-lg shadow-xl">
           {weather && (
             <>
-              <div className="flex items-center justify-between">
-                <button
-                  onClick={handleBackButtonClick}
-                  className="text-gray-300 hover:text-white focus:outline-none"
-                >
+              <div className="flex items-center justify-between text-gray-300 hover:text-white focus:outline-none">
+                <Link to="/">
                   <UilArrowLeft size={30} className="mt-4" />
-                </button>
+                </Link>
               </div>
               <TopButtons setQuery={setQuery} />
               <Inputs setQuery={setQuery} units={units} setUnits={setUnits} />
@@ -187,4 +202,4 @@ function App() {
   );
 }
 
-export default App;
+export default WeatherDetails;

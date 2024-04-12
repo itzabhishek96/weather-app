@@ -1,11 +1,6 @@
 import React from "react";
 import {
-  UilTemperature,
-  UilTear,
-  UilWind,
-  UilSun,
-  UilSunset,
-} from "@iconscout/react-unicons";
+  UilTemperature, UilTear, UilWind, UilSun, UilSunset } from "@iconscout/react-unicons";
 import { formatToLocalTime, iconUrlFromCode } from "../services/weatherService";
 
 function TemperatureAndDetails({
@@ -52,38 +47,37 @@ function TemperatureAndDetails({
       </div>
 
       <div className="flex flex-col sm:flex-row items-center justify-center text-white text-xs sm:text-sm py-3 space-y-2 sm:space-y-0 sm:space-x-2">
-  <UilSun />
-  <p className="font-light">
-    Rise:{" "}
-    <span className="font-medium ml-1">
-      {formatToLocalTime(sunrise, timezone, "hh:mm a")}
-    </span>
-  </p>
-  <p className="font-light sm:hidden">|</p>
+        <UilSun />
+        <p className="font-light">
+          Rise:{" "}
+          <span className="font-medium ml-1">
+            {formatToLocalTime(sunrise, timezone, "hh:mm a")}
+          </span>
+        </p>
+        <p className="font-light sm:hidden">|</p>
 
-  <UilSunset />
-  <p className="font-light">
-    Set:{" "}
-    <span className="font-medium ml-1">
-      {formatToLocalTime(sunset, timezone, "hh:mm a")}
-    </span>
-  </p>
-  <p className="font-light sm:hidden">|</p>
+        <UilSunset />
+        <p className="font-light">
+          Set:{" "}
+          <span className="font-medium ml-1">
+            {formatToLocalTime(sunset, timezone, "hh:mm a")}
+          </span>
+        </p>
+        <p className="font-light sm:hidden">|</p>
 
-  <UilSun />
-  <p className="font-light">
-    High:{" "}
-    <span className="font-medium ml-1">{`${temp_max.toFixed()}°`}</span>
-  </p>
-  <p className="font-light sm:hidden">|</p>
+        <UilSun />
+        <p className="font-light">
+          High:{" "}
+          <span className="font-medium ml-1">{`${temp_max.toFixed()}°`}</span>
+        </p>
+        <p className="font-light sm:hidden">|</p>
 
-  <UilSun />
-  <p className="font-light">
-    Low:{" "}
-    <span className="font-medium ml-1">{`${temp_min.toFixed()}°`}</span>
-  </p>
-</div>
-
+        <UilSun />
+        <p className="font-light">
+          Low:{" "}
+          <span className="font-medium ml-1">{`${temp_min.toFixed()}°`}</span>
+        </p>
+      </div>
     </div>
   );
 }

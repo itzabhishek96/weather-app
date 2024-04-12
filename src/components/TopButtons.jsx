@@ -4,7 +4,7 @@ function TopButtons({ setQuery }) {
   const cities = [
     {
       id: 1,
-      title: "London",
+      title: "New York",
     },
     {
       id: 2,
@@ -12,7 +12,7 @@ function TopButtons({ setQuery }) {
     },
     {
       id: 3,
-      title: "Leh",
+      title: "Dubai",
     },
     {
       id: 4,
@@ -25,7 +25,7 @@ function TopButtons({ setQuery }) {
   ];
 
   return (
-    <div className="flex flex-wrap items-center justify-around my-6">
+    <div className="flex flex-wrap items-center justify-around my-2">
       {cities.map((city) => (
         <button
           key={city.id}

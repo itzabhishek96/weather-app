@@ -1,10 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
-import {
-  UilSearch,
-  UilLocationPoint,
-  UilTimes,
-} from "@iconscout/react-unicons";
+import { UilLocationPoint } from "@iconscout/react-unicons";
 import debounce from "lodash/debounce";
 import { fetchCities } from "../services/weatherService";
 import { AsyncPaginate } from "react-select-async-paginate";
@@ -33,7 +29,7 @@ function Inputs({ setQuery, units, setUnits, onSearchChange }) {
 
   const loadOptions = async (inputValue) => {
     setIsSearching(true);
-    const response = await fetchCities(inputValue); // Assuming fetchCities returns the required format
+    const response = await fetchCities(inputValue);
     setIsSearching(false);
     return {
       options: response.data.map((city) => ({
@@ -59,7 +55,6 @@ function Inputs({ setQuery, units, setUnits, onSearchChange }) {
         GEO_API_OPTIONS
       );
       const data = await response.json();
-      // Process and display the data as needed
       setIsSearching(false);
     } catch (error) {
       console.error(error);
@@ -67,45 +62,34 @@ function Inputs({ setQuery, units, setUnits, onSearchChange }) {
     }
   }, 300); // 300ms debounce time
 
-  const clearSearch = () => {
-    setCity("");
-    setSearchValue(null); // Clear the searchValue state when clearing the search
-    setIsSearching(false);
-  };
-
-  const handleKeyDown = (event) => {
-    if (event.key === "Enter") {
-      handleSearchClick();
-    }
-  };
-
   const handleUnitsChange = (e) => {
     const selectedUnit = e.currentTarget.name;
     if (units !== selectedUnit) setUnits(selectedUnit);
   };
 
-  const handleSearchClick = () => {
-    if (city !== "") setQuery({ q: city });
-  };
-
   const handleLocationClick = () => {
     if (navigator.geolocation) {
-      toast.info("Fetching users location.");
-      navigator.geolocation.getCurrentPosition((position) => {
-        toast.success("Location fetched!");
-        let lat = position.coords.latitude;
-        let lon = position.coords.longitude;
-
-        setQuery({
-          lat,
-          lon,
-        });
-      });
+      toast.info("Fetching user's location.");
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          toast.success("Location fetched!");
+          const { latitude, longitude } = position.coords;
+          setQuery({
+            lat: latitude,
+            lon: longitude,
+          });
+        },
+        (err) => {
+          toast.error("Failed to fetch location: " + err.message);
+        }
+      );
+    } else {
+      toast.error("Geolocation is not supported by this browser.");
     }
   };
 
   return (
-    <div className="inputs-container flex items-center justify-center mt-8">
+    <div className="inputs-container flex items-center justify-center">
       <div className="search-bar w-full relative">
         <AsyncPaginate
           value={searchValue}
